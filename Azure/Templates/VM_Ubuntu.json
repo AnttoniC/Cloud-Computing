@@ -1,0 +1,197 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "projectName": {
+      "type": "string",
+      "metadata": {
+        "description": "Especifica um nome para gerar nomes de recursos."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Especifica a localização para todos os recursos."
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Especifica a usuario para VM"
+      }
+    },
+    "adminPublicKey": {
+      "type": "string",
+      "metadata": {
+        "description": "Especifica o arquivo de chave pública SSH rsa como uma sequência. Use \\ 'ssh-keygen -t rsa -b 2048 \\' para gerar seus pares de chaves SSH."
+      }
+    }
+  },
+  "variables": {
+    "vNetName": "[concat(parameters('projectName'), '-vnet')]",
+    "vNetAddressPrefixes": "10.0.0.0/16",
+    "vNetSubnetName": "default",
+    "vNetSubnetAddressPrefix": "10.0.0.0/24",
+    "vmName": "[concat(parameters('projectName'), '-vm')]",
+    "publicIPAddressName": "[concat(parameters('projectName'), '-ip')]",
+    "networkInterfaceName": "[concat(parameters('projectName'), '-nic')]",
+    "networkSecurityGroupName": "[concat(parameters('projectName'), '-nsg')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2018-11-01",
+      "name": "[variables('networkSecurityGroupName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "ssh_rule",
+            "properties": {
+              "description": "Bloqueia a entrada na porta padrão ssh 22.",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 123,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2018-11-01",
+      "name": "[variables('publicIPAddressName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic"
+      },
+      "sku": {
+        "name": "Basic"
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2018-11-01",
+      "name": "[variables('vNetName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('vNetAddressPrefixes')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('vNetSubnetName')]",
+            "properties": {
+              "addressPrefix": "[variables('vNetSubnetAddressPrefix')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2018-11-01",
+      "name": "[variables('networkInterfaceName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]"
+              },
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('vNetSubnetName'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2018-10-01",
+      "name": "[variables('vmName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "Standard_D2s_v3"
+        },
+        "osProfile": {
+          "computerName": "[variables('vmName')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": true,
+            "ssh": {
+              "publicKeys": [
+                {
+                  "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                  "keyData": "[parameters('adminPublicKey')]"
+                }
+              ]
+            }
+          }
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "Canonical",
+            "offer": "UbuntuServer",
+            "sku": "18.04-LTS",
+            "version": "latest"
+          },
+          "osDisk": {
+            "createOption": "fromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+            }
+          ]
+        }   
+    }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "Teste_script",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+    
+      "properties": {
+        "publisher": "Microsoft.OSTCExtensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "1.5",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": ["https://raw.githubusercontent.com/AnttoniC/TAR/master/Azure/Teste.sh"],
+          "commandToExecute": "./Teste.sh"
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "adminUsername": {
+      "type": "string",
+      "value": "[parameters('adminUsername')]"
+    }
+  }
+}

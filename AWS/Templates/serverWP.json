@@ -1,0 +1,75 @@
+{
+	"AWSTemplateFormatVersion": "2010-09-09",
+	"Description": "Criacao de um Servidor Simples",
+	"Parameters": {
+		"KeyName": {
+			"Description": "Nome do par de chaves",
+			"Type": "AWS::EC2::KeyPair::KeyName",
+			"Default": "mykey"
+		},
+		"VPC": {
+			"Description": "O VPC a ser utilizado",
+			"Type": "AWS::EC2::VPC::Id"
+		},
+		"Subnet": {
+			"Description": "Subrede a ser utilizada",
+			"Type": "AWS::EC2::Subnet::Id"
+		},
+		"InstanceType": {
+			"Description": "Tipo de instancia",
+			"Type": "String",
+			"Default": "t2.micro",
+			"AllowedValues": ["t2.micro", "t2.small", "t2.medium"]
+		}
+	},
+	"Mappings": {
+		"EC2RegionMap": {
+			"ap-northeast-1": {"Ubuntu1804": "ami-062c4c2caab985b81"},
+			"ap-southeast-1": {"Ubuntu1804": "ami-078b90ef1dce61046"},
+			"ap-southeast-2": {"Ubuntu1804": "ami-03f2717aebd47830e"},
+			"eu-central-1": {"Ubuntu1804": "ami-0a4e97a724f672c4c"},
+			"eu-west-1": {"Ubuntu1804": "ami-0a10e725ed0eaf48c"},
+			"sa-east-1": {"Ubuntu1804": "ami-09f4cd7c0b533b081"},
+			"us-east-1": {"Ubuntu1804": "ami-0c1481f2732d82982"},
+			"us-west-1": {"Ubuntu1804": "ami-0c1481f2732d82982"},
+			"us-west-2": {"Ubuntu1804": "ami-0dc34f4b016c9ce49"}
+		}
+	},
+	"Resources": {
+		"SecurityGroup": {
+			"Type": "AWS::EC2::SecurityGroup",
+			"Properties": {
+				"GroupDescription": "Grupo de Seguranca Teste CloudFormation",
+				"VpcId": {"Ref": "VPC"},
+				"SecurityGroupIngress": [{
+					"CidrIp": "0.0.0.0/0",
+					"FromPort": 22,
+					"IpProtocol": "tcp",
+					"ToPort": 22
+				},
+				{
+					"IpProtocol": "tcp",
+                       	 		"FromPort": "80",
+                        		"ToPort": "80",
+                        		"CidrIp": "0.0.0.0/0"
+				}]
+			}
+		},
+		"Server": {
+			"Type": "AWS::EC2::Instance",
+			"Properties": {
+				"ImageId": {"Fn::FindInMap": ["EC2RegionMap", {"Ref": "AWS::Region"}, "Ubuntu1804"]},
+				"InstanceType": {"Ref": "InstanceType"},
+				"KeyName": {"Ref": "KeyName"},
+				"SecurityGroupIds": [{"Ref": "SecurityGroup"}],
+				"SubnetId": {"Ref": "Subnet"}
+			}
+		}
+	},
+	"Outputs": {
+		"PublicName": {
+			"Value": {"Fn::GetAtt": ["Server", "PublicDnsName"]},
+			"Description": "IP Publico (conexao via SSH usuario ubuntu)"
+		}
+	}
+}

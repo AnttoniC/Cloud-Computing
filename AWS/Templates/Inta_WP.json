@@ -1,0 +1,126 @@
+{
+    "Reservations": [
+        {
+            "Instances": [
+                {
+                    "Monitoring": {
+                        "State": "disabled"
+                    }, 
+                    "PublicDnsName": "ec2-18-228-59-145.sa-east-1.compute.amazonaws.com", 
+                    "State": {
+                        "Code": 16, 
+                        "Name": "running"
+                    }, 
+                    "EbsOptimized": false, 
+                    "LaunchTime": "2019-05-30T15:21:24.000Z", 
+                    "PublicIpAddress": "18.228.59.145", 
+                    "PrivateIpAddress": "172.31.5.101", 
+                    "ProductCodes": [], 
+                    "VpcId": "vpc-ccd864ab", 
+                    "CpuOptions": {
+                        "CoreCount": 1, 
+                        "ThreadsPerCore": 1
+                    }, 
+                    "StateTransitionReason": "", 
+                    "InstanceId": "i-03303d207e0fbea18", 
+                    "EnaSupport": true, 
+                    "ImageId": "ami-09f4cd7c0b533b081", 
+                    "PrivateDnsName": "ip-172-31-5-101.sa-east-1.compute.internal", 
+                    "KeyName": "Key_AWS_01", 
+                    "SecurityGroups": [
+                        {
+                            "GroupName": "TAR", 
+                            "GroupId": "sg-0351984540dc266bd"
+                        }
+                    ], 
+                    "ClientToken": "", 
+                    "SubnetId": "subnet-6a16200d", 
+                    "InstanceType": "t2.micro", 
+                    "CapacityReservationSpecification": {
+                        "CapacityReservationPreference": "open"
+                    }, 
+                    "NetworkInterfaces": [
+                        {
+                            "Status": "in-use", 
+                            "MacAddress": "02:64:c3:65:a1:aa", 
+                            "SourceDestCheck": true, 
+                            "VpcId": "vpc-ccd864ab", 
+                            "Description": "", 
+                            "NetworkInterfaceId": "eni-0259ff5defd98a24e", 
+                            "PrivateIpAddresses": [
+                                {
+                                    "PrivateDnsName": "ip-172-31-5-101.sa-east-1.compute.internal", 
+                                    "PrivateIpAddress": "172.31.5.101", 
+                                    "Primary": true, 
+                                    "Association": {
+                                        "PublicIp": "18.228.59.145", 
+                                        "PublicDnsName": "ec2-18-228-59-145.sa-east-1.compute.amazonaws.com", 
+                                        "IpOwnerId": "amazon"
+                                    }
+                                }
+                            ], 
+                            "PrivateDnsName": "ip-172-31-5-101.sa-east-1.compute.internal", 
+                            "Attachment": {
+                                "Status": "attached", 
+                                "DeviceIndex": 0, 
+                                "DeleteOnTermination": true, 
+                                "AttachmentId": "eni-attach-05cb13b9738f4e22a", 
+                                "AttachTime": "2019-05-30T15:21:24.000Z"
+                            }, 
+                            "Groups": [
+                                {
+                                    "GroupName": "TAR", 
+                                    "GroupId": "sg-0351984540dc266bd"
+                                }
+                            ], 
+                            "Ipv6Addresses": [], 
+                            "OwnerId": "659728231813", 
+                            "PrivateIpAddress": "172.31.5.101", 
+                            "SubnetId": "subnet-6a16200d", 
+                            "Association": {
+                                "PublicIp": "18.228.59.145", 
+                                "PublicDnsName": "ec2-18-228-59-145.sa-east-1.compute.amazonaws.com", 
+                                "IpOwnerId": "amazon"
+                            }
+                        }
+                    ], 
+                    "SourceDestCheck": true, 
+                    "Placement": {
+                        "Tenancy": "default", 
+                        "GroupName": "", 
+                        "AvailabilityZone": "sa-east-1a"
+                    }, 
+                    "Hypervisor": "xen", 
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/sda1", 
+                            "Ebs": {
+                                "Status": "attached", 
+                                "DeleteOnTermination": true, 
+                                "VolumeId": "vol-0083ac6d4959e92c4", 
+                                "AttachTime": "2019-05-30T15:21:24.000Z"
+                            }
+                        }
+                    ], 
+                    "Architecture": "x86_64", 
+                    "RootDeviceType": "ebs", 
+                    "RootDeviceName": "/dev/sda1", 
+                    "VirtualizationType": "hvm", 
+                    "Tags": [
+                        {
+                            "Value": "WP", 
+                            "Key": "Name"
+                        }
+                    ], 
+                    "HibernationOptions": {
+                        "Configured": false
+                    }, 
+                    "AmiLaunchIndex": 0
+                }
+            ], 
+            "ReservationId": "r-04606422e8dd18eeb", 
+            "Groups": [], 
+            "OwnerId": "659728231813"
+        }
+    ]
+}
